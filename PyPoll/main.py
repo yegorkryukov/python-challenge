@@ -1,4 +1,4 @@
-import os, csv, sys, operator
+import os, csv, operator
 
 #ser variable for input file
 folder = 'Resources/'
