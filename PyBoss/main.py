@@ -1,4 +1,4 @@
-import os, csv, operator, datetime
+import os, csv, datetime
 
 # Set US State conversion dictionary
 us_state_abbrev = {
