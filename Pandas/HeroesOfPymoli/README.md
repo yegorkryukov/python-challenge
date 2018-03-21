@@ -305,8 +305,6 @@ demografics_df
   * Average Purchase Price
   * Total Purchase Value
   * Normalized Totals
-  
-# Ask TAs about normalized totals!!!
 
 
 ```python
