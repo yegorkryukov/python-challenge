@@ -398,8 +398,6 @@ purchases_df
   * Average Purchase Price
   * Total Purchase Value
   * Normalized Totals
-  
-# Ask TAs about normalized totals!!!
 
 
 ```python
@@ -519,7 +517,12 @@ age_df['Average Purchase Value'] = (age_df['Total Purchase Value'] / age_df['Pur
 
 #calculate normalized purchase value
 age_df['Normalized Purchase Value'] = (age_df['Total Purchase Value'] / \
-                                        players_age_df['Total Count of Players']).map('${:,.2f}'.format)
+                                       players_age_df['Total Count of Players']).map('${:,.2f}'.format)
+
+#calculate percent of all purchases
+age_df['Percentage of Purchases'] = (age_df['Total Purchase Value'] / \
+                                     age_df['Total Purchase Value'].sum() * 100 \
+                                    ).map('{0:.2f}%'.format)
 
 age_df
 ```
@@ -549,9 +552,11 @@ age_df
       <th>Total Purchase Value</th>
       <th>Average Purchase Value</th>
       <th>Normalized Purchase Value</th>
+      <th>Percentage of Purchases</th>
     </tr>
     <tr>
       <th>Age Group</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -565,6 +570,7 @@ age_df
       <td>96.62</td>
       <td>$3.02</td>
       <td>$4.39</td>
+      <td>4.23%</td>
     </tr>
     <tr>
       <th>10-14</th>
@@ -572,6 +578,7 @@ age_df
       <td>83.79</td>
       <td>$2.70</td>
       <td>$4.19</td>
+      <td>3.66%</td>
     </tr>
     <tr>
       <th>15-19</th>
@@ -579,6 +586,7 @@ age_df
       <td>386.42</td>
       <td>$2.91</td>
       <td>$3.86</td>
+      <td>16.90%</td>
     </tr>
     <tr>
       <th>20-24</th>
@@ -586,6 +594,7 @@ age_df
       <td>978.77</td>
       <td>$2.91</td>
       <td>$3.78</td>
+      <td>42.81%</td>
     </tr>
     <tr>
       <th>25-29</th>
@@ -593,6 +602,7 @@ age_df
       <td>370.33</td>
       <td>$2.96</td>
       <td>$4.26</td>
+      <td>16.20%</td>
     </tr>
     <tr>
       <th>30-34</th>
@@ -600,6 +610,7 @@ age_df
       <td>197.25</td>
       <td>$3.13</td>
       <td>$4.20</td>
+      <td>8.63%</td>
     </tr>
     <tr>
       <th>35-39</th>
@@ -607,6 +618,7 @@ age_df
       <td>119.40</td>
       <td>$2.84</td>
       <td>$4.42</td>
+      <td>5.22%</td>
     </tr>
     <tr>
       <th>40+</th>
@@ -614,6 +626,7 @@ age_df
       <td>53.75</td>
       <td>$3.16</td>
       <td>$4.89</td>
+      <td>2.35%</td>
     </tr>
   </tbody>
 </table>
@@ -825,10 +838,17 @@ item_top_df = item_top_df.rename(columns={'Price':'Item Price'})
 #swap columns
 item_top_df = item_top_df.reindex(columns = ['Purchase Count', 'Item Price','Total Purchase Value'])
  
+#calculate total purchases
+total_purchases = pymoli_df['Price'].sum()
+
+#calculate percentage of total purcahses per item
+item_top_df['Percentage of purchases'] = (item_top_df['Total Purchase Value'] / \
+                                          total_purchases * 100 \
+                                         ).map('{0:.2f}%'.format)    
+    
 #format values
 item_top_df = item_top_df.style.format({'Item Price': '${:,.2f}', 'Total Purchase Value': '${:,.2f}'})
 
-                             
 item_top_df
 ```
 
@@ -837,60 +857,64 @@ item_top_df
 
 <style  type="text/css" >
 </style>  
-<table id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00" > 
+<table id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00" > 
 <thead>    <tr> 
         <th class="blank" ></th> 
         <th class="blank level0" ></th> 
         <th class="col_heading level0 col0" >Purchase Count</th> 
         <th class="col_heading level0 col1" >Item Price</th> 
         <th class="col_heading level0 col2" >Total Purchase Value</th> 
+        <th class="col_heading level0 col3" >Percentage of purchases</th> 
     </tr>    <tr> 
         <th class="index_name level0" >Item ID</th> 
         <th class="index_name level1" >Item Name</th> 
         <th class="blank" ></th> 
         <th class="blank" ></th> 
         <th class="blank" ></th> 
+        <th class="blank" ></th> 
     </tr></thead> 
 <tbody>    <tr> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level0_row0" class="row_heading level0 row0" >34</th> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level1_row0" class="row_heading level1 row0" >Retribution Axe</th> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row0_col0" class="data row0 col0" >9</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row0_col1" class="data row0 col1" >$4.14</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row0_col2" class="data row0 col2" >$37.26</td> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level0_row0" class="row_heading level0 row0" >34</th> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level1_row0" class="row_heading level1 row0" >Retribution Axe</th> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row0_col0" class="data row0 col0" >9</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row0_col1" class="data row0 col1" >$4.14</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row0_col2" class="data row0 col2" >$37.26</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row0_col3" class="data row0 col3" >1.63%</td> 
     </tr>    <tr> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level0_row1" class="row_heading level0 row1" >115</th> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level1_row1" class="row_heading level1 row1" >Spectral Diamond Doomblade</th> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row1_col0" class="data row1 col0" >7</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row1_col1" class="data row1 col1" >$4.25</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row1_col2" class="data row1 col2" >$29.75</td> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level0_row1" class="row_heading level0 row1" >115</th> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level1_row1" class="row_heading level1 row1" >Spectral Diamond Doomblade</th> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row1_col0" class="data row1 col0" >7</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row1_col1" class="data row1 col1" >$4.25</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row1_col2" class="data row1 col2" >$29.75</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row1_col3" class="data row1 col3" >1.30%</td> 
     </tr>    <tr> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level0_row2" class="row_heading level0 row2" >32</th> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level1_row2" class="row_heading level1 row2" >Orenmir</th> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row2_col0" class="data row2 col0" >6</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row2_col1" class="data row2 col1" >$4.95</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row2_col2" class="data row2 col2" >$29.70</td> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level0_row2" class="row_heading level0 row2" >32</th> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level1_row2" class="row_heading level1 row2" >Orenmir</th> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row2_col0" class="data row2 col0" >6</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row2_col1" class="data row2 col1" >$4.95</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row2_col2" class="data row2 col2" >$29.70</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row2_col3" class="data row2 col3" >1.30%</td> 
     </tr>    <tr> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level0_row3" class="row_heading level0 row3" >103</th> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level1_row3" class="row_heading level1 row3" >Singed Scalpel</th> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row3_col0" class="data row3 col0" >6</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row3_col1" class="data row3 col1" >$4.87</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row3_col2" class="data row3 col2" >$29.22</td> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level0_row3" class="row_heading level0 row3" >103</th> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level1_row3" class="row_heading level1 row3" >Singed Scalpel</th> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row3_col0" class="data row3 col0" >6</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row3_col1" class="data row3 col1" >$4.87</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row3_col2" class="data row3 col2" >$29.22</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row3_col3" class="data row3 col3" >1.28%</td> 
     </tr>    <tr> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level0_row4" class="row_heading level0 row4" >107</th> 
-        <th id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00level1_row4" class="row_heading level1 row4" >Splitter, Foe Of Subtlety</th> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row4_col0" class="data row4 col0" >8</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row4_col1" class="data row4 col1" >$3.61</td> 
-        <td id="T_1af34162_2c65_11e8_b1ac_8c85901d5a00row4_col2" class="data row4 col2" >$28.88</td> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level0_row4" class="row_heading level0 row4" >107</th> 
+        <th id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00level1_row4" class="row_heading level1 row4" >Splitter, Foe Of Subtlety</th> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row4_col0" class="data row4 col0" >8</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row4_col1" class="data row4 col1" >$3.61</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row4_col2" class="data row4 col2" >$28.88</td> 
+        <td id="T_0e14597a_2d57_11e8_9a57_8c85901d5a00row4_col3" class="data row4 col3" >1.26%</td> 
     </tr></tbody> 
 </table> 
 
 
 
-As final considerations:
-
-* Your script must work for both data-sets given.
-* You must use the Pandas Library and the Jupyter Notebook.
-* You must submit a link to your Jupyter Notebook with the viewable Data Frames. 
-* You must include an exported markdown version of your Notebook called  `README.md` in your GitHub repository.  
-* You must include a written description of three observable trends based on the data. 
-* See [Example Solution](HeroesOfPymoli/HeroesOfPymoli_Example.pdf) for a reference on expected format. 
+## Observations:
+* 80% of the players are male
+* Almost half of the players are between 20-24 yo
+* All age groups spend about the same amount of money per player
+* Top purchased items are about the same percentage of all purchases
