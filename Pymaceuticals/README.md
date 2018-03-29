@@ -684,24 +684,6 @@ totals.set_index('Drug').head(3)
 
 
 ```python
-mask = totals['Tumor'] < 0
-
-colors = np.array(['r']*len(totals))
-colors[mask.values] = 'g'
-
-colors = colors.tolist()
-colors
-```
-
-
-
-
-    ['g', 'r', 'r', 'r', 'r', 'r', 'r', 'g', 'r', 'r']
-
-
-
-
-```python
 #set fivethirtyeight styles
 mpl.style.use('fivethirtyeight')
 
@@ -753,7 +735,7 @@ plt.show()
 ```
 
 
-![png](output_22_0.png)
+![png](output_21_0.png)
 
 
 # Observations
