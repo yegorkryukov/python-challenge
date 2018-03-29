@@ -5,7 +5,7 @@
 
 While your data companions rushed off to jobs in finance and government, you remained adamant that science was the way for you. Staying true to your mission, you've since joined Pymaceuticals Inc., a burgeoning pharmaceutical company based out of San Diego, CA. Pymaceuticals specializes in drug-based, anti-cancer pharmaceuticals. In their most recent efforts, they've since begun screening for potential treatments to squamous cell carcinoma (SCC), a commonly occurring form of skin cancer.
 
-As their Chief Data Analyst, you've been given access to the complete data from their most recent animal study. In this study, 250 mice were treated through a variety of drug regimes over the course of 45 days. Their physiological responses were then monitored over the course of that time. Your objective is to analyze the data to show how four treatments (Capomulin, Infubinol, Ketapril, and Placebo) compare.
+As their Chief Data Analyst, you've been given access to the complete data from their most recent animal study. In this study, 250 mice were treated through a variety of drug regimes over the course of 45 days. Their physiological responses were then monitored over the course of that time. Your objective is to analyze the data to show how four treatments (**Capomulin, Infubinol, Ketapril, and Placebo**) compare.
 
 
 ```python
@@ -90,8 +90,81 @@ drug_df = drug_df.drop_duplicates(subset='Mouse ID')
 
 
 ```python
+#leave only Capomulin, Infubinol, Ketapril, and Placebo for analysis
+#create df with list of drugs to keep
+drugs_list = pd.DataFrame(data={'Drug':['Capomulin', 'Infubinol', 'Ketapril', 'Placebo']})
+
+#merge with provided df to keep the only needed drugs
+drug_df = pd.merge(drugs_list, drug_df, on='Drug')
+drug_df.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Drug</th>
+      <th>Mouse ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Capomulin</td>
+      <td>b128</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Capomulin</td>
+      <td>r944</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Capomulin</td>
+      <td>s185</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Capomulin</td>
+      <td>w914</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Capomulin</td>
+      <td>l897</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
 #combine data over city name
 data_df = pd.merge(trial_df, drug_df, on='Mouse ID')
+```
+
+
+```python
+data_df = data_df.set_index('Drug')
 ```
 
 
@@ -124,49 +197,50 @@ data_df.head()
       <th>Timepoint</th>
       <th>Tumor Volume (mm3)</th>
       <th>Metastatic Sites</th>
+    </tr>
+    <tr>
       <th>Drug</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
+      <th>Capomulin</th>
       <td>b128</td>
       <td>0</td>
       <td>45.000000</td>
       <td>0</td>
-      <td>Capomulin</td>
     </tr>
     <tr>
-      <th>1</th>
+      <th>Capomulin</th>
       <td>b128</td>
       <td>5</td>
       <td>45.651331</td>
       <td>0</td>
-      <td>Capomulin</td>
     </tr>
     <tr>
-      <th>2</th>
+      <th>Capomulin</th>
       <td>b128</td>
       <td>10</td>
       <td>43.270852</td>
       <td>0</td>
-      <td>Capomulin</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>Capomulin</th>
       <td>b128</td>
       <td>15</td>
       <td>43.784893</td>
       <td>0</td>
-      <td>Capomulin</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>Capomulin</th>
       <td>b128</td>
       <td>20</td>
       <td>42.731552</td>
       <td>0</td>
-      <td>Capomulin</td>
     </tr>
   </tbody>
 </table>
@@ -175,6 +249,128 @@ data_df.head()
 
 
 # Creating a scatter plot that shows how the tumor volume changes over time for each treatment.
+
+
+```python
+#calculate standard errors
+tumor_error = data_df.groupby(['Drug', 'Timepoint']).sem()['Tumor Volume (mm3)'].unstack(level=0)
+met_error = data_df.groupby(['Drug', 'Timepoint']).sem()['Metastatic Sites'].unstack(level=0)
+
+
+
+tumor_error
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Drug</th>
+      <th>Capomulin</th>
+      <th>Infubinol</th>
+      <th>Ketapril</th>
+      <th>Placebo</th>
+    </tr>
+    <tr>
+      <th>Timepoint</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.448593</td>
+      <td>0.235102</td>
+      <td>0.264819</td>
+      <td>0.218091</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.702684</td>
+      <td>0.282346</td>
+      <td>0.357421</td>
+      <td>0.402064</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>0.838617</td>
+      <td>0.357705</td>
+      <td>0.580268</td>
+      <td>0.614461</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>0.909731</td>
+      <td>0.476210</td>
+      <td>0.726484</td>
+      <td>0.839609</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>0.881642</td>
+      <td>0.550315</td>
+      <td>0.755413</td>
+      <td>1.034872</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>0.934460</td>
+      <td>0.631061</td>
+      <td>0.934121</td>
+      <td>1.218231</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>1.052241</td>
+      <td>0.984155</td>
+      <td>1.127867</td>
+      <td>1.287481</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>1.223608</td>
+      <td>1.055220</td>
+      <td>1.158449</td>
+      <td>1.370634</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>1.223977</td>
+      <td>1.144427</td>
+      <td>1.453186</td>
+      <td>1.351726</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
@@ -205,24 +401,12 @@ by_drug.head(3)
     <tr style="text-align: right;">
       <th>Drug</th>
       <th>Capomulin</th>
-      <th>Ceftamin</th>
       <th>Infubinol</th>
       <th>Ketapril</th>
-      <th>Naftisol</th>
       <th>Placebo</th>
-      <th>Propriva</th>
-      <th>Ramicane</th>
-      <th>Stelasyn</th>
-      <th>Zoniferol</th>
     </tr>
     <tr>
       <th>Timepoint</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -236,50 +420,26 @@ by_drug.head(3)
       <td>45.000000</td>
       <td>45.000000</td>
       <td>45.000000</td>
-      <td>45.000000</td>
-      <td>45.000000</td>
-      <td>45.00000</td>
-      <td>45.000000</td>
-      <td>45.000000</td>
-      <td>45.000000</td>
     </tr>
     <tr>
       <th>5</th>
       <td>44.266086</td>
-      <td>46.503051</td>
       <td>47.062001</td>
       <td>47.389175</td>
-      <td>46.796098</td>
       <td>47.125589</td>
-      <td>47.16813</td>
-      <td>43.944859</td>
-      <td>47.527452</td>
-      <td>46.851818</td>
     </tr>
     <tr>
       <th>10</th>
       <td>43.084291</td>
-      <td>48.285125</td>
       <td>49.403909</td>
       <td>49.582269</td>
-      <td>48.694210</td>
       <td>49.423329</td>
-      <td>48.93856</td>
-      <td>42.531957</td>
-      <td>49.463844</td>
-      <td>48.689881</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-
-
-```python
-#calculate error bars for the plot
-errors = by_drug.sem(axis=0).tolist()
-```
 
 
 ```python
@@ -290,7 +450,7 @@ mpl.style.use('fivethirtyeight')
 f, ax = plt.subplots(figsize=(13,10))
 
 #plot df
-g = by_drug.plot(ax=ax, style='--', yerr=errors)
+g = by_drug.plot(ax=ax, style='--', yerr=tumor_error)
 g.tick_params(axis = 'both', which = 'both', labelsize = 18)
 
 # create valid markers from mpl.markers
@@ -313,7 +473,7 @@ plt.show()
 ```
 
 
-![png](output_10_0.png)
+![png](output_12_0.png)
 
 
 # Creating a scatter plot that shows how the number of [metastatic](https://en.wikipedia.org/wiki/Metastasis) (cancer spreading) sites changes over time for each treatment.
@@ -347,24 +507,12 @@ met.head(3)
     <tr style="text-align: right;">
       <th>Drug</th>
       <th>Capomulin</th>
-      <th>Ceftamin</th>
       <th>Infubinol</th>
       <th>Ketapril</th>
-      <th>Naftisol</th>
       <th>Placebo</th>
-      <th>Propriva</th>
-      <th>Ramicane</th>
-      <th>Stelasyn</th>
-      <th>Zoniferol</th>
     </tr>
     <tr>
       <th>Timepoint</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -378,50 +526,26 @@ met.head(3)
       <td>0.000000</td>
       <td>0.000000</td>
       <td>0.000000</td>
-      <td>0.00000</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
-      <td>0.00</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
     </tr>
     <tr>
       <th>5</th>
       <td>0.16</td>
-      <td>0.380952</td>
       <td>0.280000</td>
       <td>0.304348</td>
-      <td>0.26087</td>
       <td>0.375000</td>
-      <td>0.347826</td>
-      <td>0.12</td>
-      <td>0.240000</td>
-      <td>0.166667</td>
     </tr>
     <tr>
       <th>10</th>
       <td>0.32</td>
-      <td>0.600000</td>
       <td>0.666667</td>
       <td>0.590909</td>
-      <td>0.52381</td>
       <td>0.833333</td>
-      <td>0.619048</td>
-      <td>0.25</td>
-      <td>0.478261</td>
-      <td>0.500000</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-
-
-```python
-#calculate error bars for the plot
-errors = met.sem(axis=0).tolist()
-```
 
 
 ```python
@@ -432,7 +556,7 @@ mpl.style.use('fivethirtyeight')
 f, ax = plt.subplots(figsize=(13,10))
 
 #plot df
-g = met.plot(ax=ax, style='--', yerr=errors)
+g = met.plot(ax=ax, style='--', yerr=met_error)
 g.tick_params(axis = 'both', which = 'both', labelsize = 18)
 #g.axhline(y = 0, color = 'black', linewidth = 1.3, alpha = .7)
 
@@ -457,7 +581,7 @@ plt.show()
 ```
 
 
-![png](output_14_0.png)
+![png](output_15_0.png)
 
 
 # Creating a scatter plot that shows the number of mice still alive through the course of treatment (Survival Rate)
@@ -492,24 +616,12 @@ mice.head(3)
     <tr style="text-align: right;">
       <th>Drug</th>
       <th>Capomulin</th>
-      <th>Ceftamin</th>
       <th>Infubinol</th>
       <th>Ketapril</th>
-      <th>Naftisol</th>
       <th>Placebo</th>
-      <th>Propriva</th>
-      <th>Ramicane</th>
-      <th>Stelasyn</th>
-      <th>Zoniferol</th>
     </tr>
     <tr>
       <th>Timepoint</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -523,50 +635,26 @@ mice.head(3)
       <td>25</td>
       <td>25</td>
       <td>25</td>
-      <td>25</td>
-      <td>25</td>
-      <td>24</td>
-      <td>25</td>
-      <td>26</td>
-      <td>25</td>
     </tr>
     <tr>
       <th>5</th>
       <td>25</td>
-      <td>21</td>
       <td>25</td>
       <td>23</td>
-      <td>23</td>
-      <td>24</td>
-      <td>23</td>
-      <td>25</td>
-      <td>25</td>
       <td>24</td>
     </tr>
     <tr>
       <th>10</th>
       <td>25</td>
-      <td>20</td>
       <td>21</td>
       <td>22</td>
-      <td>21</td>
       <td>24</td>
-      <td>21</td>
-      <td>24</td>
-      <td>23</td>
-      <td>22</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-
-
-```python
-#calculate error bars for the plot
-errors = mice.sem(axis=0).tolist()
-```
 
 
 ```python
@@ -577,7 +665,7 @@ mpl.style.use('fivethirtyeight')
 f, ax = plt.subplots(figsize=(13,10))
 
 #plot df
-g = mice.plot(ax=ax, style='--', yerr=errors)
+g = mice.plot(ax=ax, style='--')
 g.tick_params(axis = 'both', which = 'both', labelsize = 18)
 #g.axhline(y = 0, color = 'black', linewidth = 1.3, alpha = .7)
 
@@ -632,7 +720,7 @@ for index, row in summary.iterrows():
 #calculate percentage change
 totals['Tumor'] = (totals['Tumor']-45)/45*100
 
-totals.set_index('Drug').head(3)
+totals.set_index('Drug')
 ```
 
 
@@ -669,12 +757,16 @@ totals.set_index('Drug').head(3)
       <td>-19.475303</td>
     </tr>
     <tr>
-      <th>Ceftamin</th>
-      <td>42.516492</td>
-    </tr>
-    <tr>
       <th>Infubinol</th>
       <td>46.123472</td>
+    </tr>
+    <tr>
+      <th>Ketapril</th>
+      <td>57.028795</td>
+    </tr>
+    <tr>
+      <th>Placebo</th>
+      <td>51.297960</td>
     </tr>
   </tbody>
 </table>
@@ -696,7 +788,7 @@ colors = np.array(['r']*len(totals))
 colors[mask.values] = 'g'
 
 #plot df
-g = plt.bar(totals.index,totals['Tumor'],color=colors)
+g = plt.bar(totals.index,totals['Tumor'],color=colors,width=0.8)
 
 def autolabel(rects, ax):
     # Get y-axis height to calculate label position from.
@@ -726,7 +818,7 @@ autolabel(g, ax)
 f.suptitle('Tumor change over 45 days treatment', y=0.91, fontsize = 26, weight = 'bold', alpha = .75)
 plt.xlabel('Drug')
 plt.ylabel('% Tumor volume change')
-plt.xticks(np.arange(10),totals['Drug'].tolist(),rotation=20)
+plt.xticks(np.arange(4),totals['Drug'].tolist(),rotation=0)
 
 vals = ax.get_yticks()
 ax.set_yticklabels(['{:3.2f}%'.format(x) for x in vals])
@@ -739,7 +831,7 @@ plt.show()
 
 
 # Observations
-* Capomuline and Ramicane were the only drugs that reduced tumors
-* The metastasic sites were also minimal for two above
-* Over 80% of mice were still alive after the treatment comparing to less than 60% for other drugs 
-
+* Capomuline is the only drugs that reduced tumors
+* The metastasic sites were also minimal for it
+* Over 90% of mice were still alive after the treatment by Capomulin comparing to less than 60% for other drugs 
+* Other drugs have no influence on the tumor just like Placebo
