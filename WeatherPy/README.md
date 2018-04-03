@@ -3270,6 +3270,34 @@ plt.show()
 ![png](output_14_1.png)
 
 
+# Scatterplots using Seaborn
+
+
+```python
+import seaborn as sns
+f, axes = plt.subplots(ncols=2,nrows=2,figsize=(20,15))
+
+sns.set_style('darkgrid')
+sns.regplot('Temperature, imperial','Latitude',data=cities_df,fit_reg=False, ax=axes[0,0])
+sns.regplot('Humidity','Latitude',data=cities_df,fit_reg=False, ax=axes[0,1])
+sns.regplot('Clouds','Latitude',data=cities_df,fit_reg=False, ax=axes[1,0])
+sns.regplot('Wind Speed MPH','Latitude',data=cities_df,fit_reg=False, ax=axes[1,1])
+
+sns.set(font_scale=2)
+axes[0,0].set_title('Temperature (°F) vs. Latitude', fontweight='bold')
+axes[0,1].set_title('Humidity (%) vs. Latitude', fontweight='bold')
+axes[1,0].set_title('Clouds (%) vs. Latitude', fontweight='bold')
+axes[1,1].set_title('Wind Speed (mph) vs. Latitude', fontweight='bold')
+
+plt.suptitle('Correlation between different weather measurements and latitude', fontweight='bold', y=.95)
+
+plt.show()
+```
+
+
+![png](output_16_0.png)
+
+
 # Trends
 * Temperatures are higher around equator
 * Humidity is higher alongside cost lines and big rivers
