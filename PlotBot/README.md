@@ -291,19 +291,6 @@ def worker():
 ```
 
 
-```python
-sentiment.columns
-```
-
-
-
-
-    Index(['compound', 'date', 'negative', 'neutral', 'positive', 'tweet',
-           'user_id'],
-          dtype='object')
-
-
-
 
 ```python
 # run the program
