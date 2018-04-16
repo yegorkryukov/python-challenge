@@ -340,19 +340,6 @@ if __name__ == '__main__':
 
 
 
-    ---------------------------------------------------------------------------
-
-    KeyboardInterrupt                         Traceback (most recent call last)
-
-    <ipython-input-164-5624cac36140> in <module>()
-          4         print('Initializing worker:')
-          5         worker()
-    ----> 6         sleep(300)
-    
-
-    KeyboardInterrupt: 
-
-
 ## Trends
 1. Bot of a fellow student appeares to be tweeting neutral texts
 2. @Discovery tends to be more positive
