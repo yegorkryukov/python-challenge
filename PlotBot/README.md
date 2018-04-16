@@ -208,8 +208,13 @@ def getSentiment(id,pages=1):
                 result = analyzer.polarity_scores(tweet["text"])
 
                 sentiment_dict = {
+                    'user_id':mentioned_user,
+                    'date':tweet['created_at'],
                     'tweet':tweet["text"],
                     'compound':result['compound'],
+                    'positive':result['pos'],
+                    'neutral':result['neu'],
+                    'negative':result['neg']
                 }
 
                 #grab all the mentions
@@ -221,11 +226,11 @@ def getSentiment(id,pages=1):
 
 ```python
 def makeGraph(df,mentioned_user):
-    path = 'results/image.png'
+    path = 'results/image_' + str(mentioned_user) + '.png'
     mentioned_user_name = api.get_user(mentioned_user)['screen_name']
     plt.style.use('fivethirtyeight')
     f, ax = plt.subplots(figsize=(20,10))
-    plt.plot(df.index, df['compound'], marker="o",markersize=10,linewidth=0.5, alpha=0.8)
+    df.plot(marker="o",markersize=10,linewidth=0.5, alpha=0.8)
     plt.gca().invert_xaxis()
     plt.xlim([len(df.index),0])
     plt.ylabel("Tweet polarity \n<negative.........positive>")
@@ -234,6 +239,7 @@ def makeGraph(df,mentioned_user):
     now = now.strftime("%m/%d/%Y")
     plt.title(f"Sentiment analysis of @{mentioned_user_name} tweets as of {now}")
     plt.savefig(path, format='png')
+    #plt.show()
     plt.close()
     api.update_with_media(path)
     return mentioned_user_name
@@ -248,10 +254,12 @@ def worker():
     mentions_df = getMentions()
 
     #setup resulting CSV
-    path = 'results/analyzed.csv'
-    columns = ['user_id','user_name']
+    path_to_analyzed = 'results/analyzed.csv'
+    path_to_sentiment = 'results/sentiment.csv'
+    columns_analyzed = ['user_id','user_name']
+    columns_sentiment = ['user_id','date','tweet','compound','positive','negative','neutral']
     print('worker: trying to read analyzed CSV')
-    analyzed_df = rwCSV(path,columns=columns)
+    analyzed_df = rwCSV(path,columns=columns_analyzed)
 
     #got through not analyzed rows
     for index, row in mentions_df.iterrows():
@@ -261,25 +269,40 @@ def worker():
         
         if row['mentioned_users']:
             mentioned_users = ast.literal_eval(str(row['mentioned_users']))
-        
             #loop through the list to analyse tweets and post graphs
             for mentioned_user in mentioned_users:
                 if mentioned_user not in analyzed_df['user_id'].tolist():
                     print(f'worker: performing sentiment analysis for user_id {mentioned_user}')
                     sentiment = getSentiment(mentioned_user,pages=5)
+                    rwCSV(path_to_sentiment,'w',df=sentiment,columns = columns_sentiment)
+
                     print(f'worker: performed sentiment analysis for user_id {mentioned_user}')
-                    mentioned_user_name = makeGraph(sentiment,mentioned_user)
+                    mentioned_user_name = makeGraph(sentiment['compound'],mentioned_user)
                     print(f'worker: generated and tweeted graph for @{mentioned_user_name}')
 
                     #change flag to analyzed and save CSV
                     analyzed_df = analyzed_df.append({'user_name':mentioned_user_name,
                                                       'user_id':mentioned_user
                                                       },ignore_index=True)
-                    rwCSV(path,'w',analyzed_df,columns)
+                    rwCSV(path_to_analyzed,'w',analyzed_df,columns)
                 else:
                     print(f'worker: user id: {mentioned_user} has already been analyzed')
             
 ```
+
+
+```python
+sentiment.columns
+```
+
+
+
+
+    Index(['compound', 'date', 'negative', 'neutral', 'positive', 'tweet',
+           'user_id'],
+          dtype='object')
+
+
 
 
 ```python
@@ -295,33 +318,6 @@ if __name__ == '__main__':
     getMentions: Got response with 4 tweet(s)
     rwCSV: returning DF from CSV
     getMentions: adding mention id: 80067314
-    getMentions: adding mention id: 17842366
-    getMentions: Tweet id: 983829906302873601 is in CSV already or doesn't have a valid mentioned user
-    getMentions: adding mention id: 979490736013021184
-    getMentions: Tweet id: 983757509960839168 is in CSV already or doesn't have a valid mentioned user
-    getMentions: Tweet id: 983698615347613696 is in CSV already or doesn't have a valid mentioned user
-    getMentions: saving new mentions to CSV
-    rwCSV: appended 1 row(s) to 'results/mentions.csv'
-    worker: trying to read analyzed CSV
-    rwCSV: returning DF from CSV
-    [17842366]
-    worker: user id: 17842366 has already been analyzed
-    [979490736013021184]
-    worker: user id: 979490736013021184 has already been analyzed
-    [80067314]
-    worker: performing sentiment analysis for user_id 80067314
-    getSentiment: trying to obtain tweets for user id 80067314, page 1
-    getSentiment: trying to obtain tweets for user id 80067314, page 2
-    getSentiment: trying to obtain tweets for user id 80067314, page 3
-    getSentiment: trying to obtain tweets for user id 80067314, page 4
-    getSentiment: trying to obtain tweets for user id 80067314, page 5
-    worker: performed sentiment analysis for user_id 80067314
-    worker: generated and tweeted graph for @ITSJPODirector
-    rwCSV: appended 4 row(s) to 'results/analyzed.csv'
-    Initializing worker:
-    getMentions: Got response with 4 tweet(s)
-    rwCSV: returning DF from CSV
-    getMentions: adding mention id: 80067314
     getMentions: Tweet id: 985700911614918658 is in CSV already or doesn't have a valid mentioned user
     getMentions: adding mention id: 17842366
     getMentions: Tweet id: 983829906302873601 is in CSV already or doesn't have a valid mentioned user
@@ -330,13 +326,37 @@ if __name__ == '__main__':
     getMentions: Tweet id: 983698615347613696 is in CSV already or doesn't have a valid mentioned user
     getMentions: No new mentions
     worker: trying to read analyzed CSV
-    rwCSV: returning DF from CSV
-    [17842366]
-    worker: user id: 17842366 has already been analyzed
-    [979490736013021184]
-    worker: user id: 979490736013021184 has already been analyzed
-    [80067314]
-    worker: user id: 80067314 has already been analyzed
+    rwCSV: returning new DF with columns: ['user_id', 'user_name']
+    worker: performing sentiment analysis for user_id 17842366
+    getSentiment: trying to obtain tweets for user id 17842366, page 1
+    getSentiment: trying to obtain tweets for user id 17842366, page 2
+    getSentiment: trying to obtain tweets for user id 17842366, page 3
+    getSentiment: trying to obtain tweets for user id 17842366, page 4
+    getSentiment: trying to obtain tweets for user id 17842366, page 5
+    rwCSV: saved 500 row(s) as new file to 'results/sentiment.csv'
+    worker: performed sentiment analysis for user_id 17842366
+    worker: generated and tweeted graph for @Discovery
+    rwCSV: saved 1 row(s) as new file to 'results/analyzed.csv'
+    worker: performing sentiment analysis for user_id 979490736013021184
+    getSentiment: trying to obtain tweets for user id 979490736013021184, page 1
+    getSentiment: trying to obtain tweets for user id 979490736013021184, page 2
+    getSentiment: trying to obtain tweets for user id 979490736013021184, page 3
+    getSentiment: trying to obtain tweets for user id 979490736013021184, page 4
+    getSentiment: trying to obtain tweets for user id 979490736013021184, page 5
+    rwCSV: appended 336 row(s) to 'results/sentiment.csv'
+    worker: performed sentiment analysis for user_id 979490736013021184
+    worker: generated and tweeted graph for @Sonik_Belka
+    rwCSV: appended 2 row(s) to 'results/analyzed.csv'
+    worker: performing sentiment analysis for user_id 80067314
+    getSentiment: trying to obtain tweets for user id 80067314, page 1
+    getSentiment: trying to obtain tweets for user id 80067314, page 2
+    getSentiment: trying to obtain tweets for user id 80067314, page 3
+    getSentiment: trying to obtain tweets for user id 80067314, page 4
+    getSentiment: trying to obtain tweets for user id 80067314, page 5
+    rwCSV: appended 500 row(s) to 'results/sentiment.csv'
+    worker: performed sentiment analysis for user_id 80067314
+    worker: generated and tweeted graph for @ITSJPODirector
+    rwCSV: appended 3 row(s) to 'results/analyzed.csv'
 
 
 
