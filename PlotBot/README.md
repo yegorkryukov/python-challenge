@@ -11,8 +11,6 @@ For example, when a user tweets, __"@PlotBot Analyze: @CNN,"__ it will trigger a
 
 A plot from the sentiment analysis is then tweeted to the PlotBot5 twitter feed. See below for examples of scatter plots you will generate:
 
-![@juanitasoranno.png](images/@juanitasoranno.png)
-
 Hints, requirements, and considerations:
 
 * Your bot should scan your account every __five minutes__ for mentions.
@@ -54,10 +52,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import ast
 from time import sleep
-```
 
-
-```python
 # Twitter API Keys
 consumer_key = consumer_key
 consumer_secret = consumer_secret
@@ -259,7 +254,7 @@ def worker():
     columns_analyzed = ['user_id','user_name']
     columns_sentiment = ['user_id','date','tweet','compound','positive','negative','neutral']
     print('worker: trying to read analyzed CSV')
-    analyzed_df = rwCSV(path,columns=columns_analyzed)
+    analyzed_df = rwCSV(path_to_analyzed,columns=columns_analyzed)
 
     #got through not analyzed rows
     for index, row in mentions_df.iterrows():
@@ -291,7 +286,6 @@ def worker():
 ```
 
 
-
 ```python
 # run the program
 if __name__ == '__main__':
@@ -302,8 +296,18 @@ if __name__ == '__main__':
 ```
 
     Initializing worker:
-    getMentions: Got response with 4 tweet(s)
+    getMentions: Got response with 9 tweet(s)
     rwCSV: returning DF from CSV
+    getMentions: adding mention id: 17842366
+    getMentions: Tweet id: 987464285654839298 is in CSV already or doesn't have a valid mentioned user
+    getMentions: adding mention id: 17842366
+    getMentions: Tweet id: 987088667108958208 is in CSV already or doesn't have a valid mentioned user
+    getMentions: adding mention id: 17842366
+    getMentions: Tweet id: 986722722301513728 is in CSV already or doesn't have a valid mentioned user
+    getMentions: adding mention id: 17842366
+    getMentions: Tweet id: 986624537730142210 is in CSV already or doesn't have a valid mentioned user
+    getMentions: adding mention id: 25073877
+    getMentions: Tweet id: 985713452370055172 is in CSV already or doesn't have a valid mentioned user
     getMentions: adding mention id: 80067314
     getMentions: Tweet id: 985700911614918658 is in CSV already or doesn't have a valid mentioned user
     getMentions: adding mention id: 17842366
@@ -313,37 +317,15 @@ if __name__ == '__main__':
     getMentions: Tweet id: 983698615347613696 is in CSV already or doesn't have a valid mentioned user
     getMentions: No new mentions
     worker: trying to read analyzed CSV
-    rwCSV: returning new DF with columns: ['user_id', 'user_name']
-    worker: performing sentiment analysis for user_id 17842366
-    getSentiment: trying to obtain tweets for user id 17842366, page 1
-    getSentiment: trying to obtain tweets for user id 17842366, page 2
-    getSentiment: trying to obtain tweets for user id 17842366, page 3
-    getSentiment: trying to obtain tweets for user id 17842366, page 4
-    getSentiment: trying to obtain tweets for user id 17842366, page 5
-    rwCSV: saved 500 row(s) as new file to 'results/sentiment.csv'
-    worker: performed sentiment analysis for user_id 17842366
-    worker: generated and tweeted graph for @Discovery
-    rwCSV: saved 1 row(s) as new file to 'results/analyzed.csv'
-    worker: performing sentiment analysis for user_id 979490736013021184
-    getSentiment: trying to obtain tweets for user id 979490736013021184, page 1
-    getSentiment: trying to obtain tweets for user id 979490736013021184, page 2
-    getSentiment: trying to obtain tweets for user id 979490736013021184, page 3
-    getSentiment: trying to obtain tweets for user id 979490736013021184, page 4
-    getSentiment: trying to obtain tweets for user id 979490736013021184, page 5
-    rwCSV: appended 336 row(s) to 'results/sentiment.csv'
-    worker: performed sentiment analysis for user_id 979490736013021184
-    worker: generated and tweeted graph for @Sonik_Belka
-    rwCSV: appended 2 row(s) to 'results/analyzed.csv'
-    worker: performing sentiment analysis for user_id 80067314
-    getSentiment: trying to obtain tweets for user id 80067314, page 1
-    getSentiment: trying to obtain tweets for user id 80067314, page 2
-    getSentiment: trying to obtain tweets for user id 80067314, page 3
-    getSentiment: trying to obtain tweets for user id 80067314, page 4
-    getSentiment: trying to obtain tweets for user id 80067314, page 5
-    rwCSV: appended 500 row(s) to 'results/sentiment.csv'
-    worker: performed sentiment analysis for user_id 80067314
-    worker: generated and tweeted graph for @ITSJPODirector
-    rwCSV: appended 3 row(s) to 'results/analyzed.csv'
+    rwCSV: returning DF from CSV
+    worker: user id: 17842366 has already been analyzed
+    worker: user id: 979490736013021184 has already been analyzed
+    worker: user id: 80067314 has already been analyzed
+    worker: user id: 25073877 has already been analyzed
+    worker: user id: 17842366 has already been analyzed
+    worker: user id: 17842366 has already been analyzed
+    worker: user id: 17842366 has already been analyzed
+    worker: user id: 17842366 has already been analyzed
 
 
 
@@ -351,3 +333,9 @@ if __name__ == '__main__':
 1. Bot of a fellow student appeares to be tweeting neutral texts
 2. @Discovery tends to be more positive
 3. @ITSJPODirector is vastly positive on twitter
+
+Links to tweets with analysis:
+1. https://twitter.com/MindThatData/status/985713668586434560
+2. https://twitter.com/MindThatData/status/985711546809683969
+3. https://twitter.com/MindThatData/status/985711520368689152
+4. https://twitter.com/MindThatData/status/985711498025734145
